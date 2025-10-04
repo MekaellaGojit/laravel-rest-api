@@ -25,7 +25,7 @@ Route::put('/products/{id}', [App\http\Controllers\ProductController::class, 'up
 Route::delete('/products/{id}', [App\http\Controllers\ProductController::class, 'destroy']);
 
 // Toggle product status
-Route::post('/products/{id}/toggle-status', [App\http\Controllers\ProductController::class, 'toggleProductStatus']);
+// Route::post('/products/{id}/toggle-status', [App\http\Controllers\ProductController::class, 'toggleProductStatus']);
 
 
 
