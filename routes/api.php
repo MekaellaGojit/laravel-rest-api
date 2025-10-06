@@ -12,6 +12,8 @@ Route::get('/test', function (Request $request){
 // Get all products
 Route::get('/products', [App\http\Controllers\ProductController::class, 'index']);
 
+Route::get('/products/search', [ProductController::class, 'searchByName']);
+
 // Get a single product
 Route::get('/products/{id}', [App\http\Controllers\ProductController::class, 'show']);
 
@@ -26,6 +28,7 @@ Route::delete('/products/{id}', [App\http\Controllers\ProductController::class, 
 
 // Toggle product status
 // Route::post('/products/{id}/toggle-status', [App\http\Controllers\ProductController::class, 'toggleProductStatus']);
+
 
 
 

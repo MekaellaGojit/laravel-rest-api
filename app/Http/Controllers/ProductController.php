@@ -135,8 +135,34 @@ class ProductController extends Controller
 
     }
 
-    // public function toggleProduct(){
+    public function searchByName(Request $request)
+    {
+        $search = trim($request->query('q'));
 
-    // }
+        if (!$search) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Provide a keyword.'
+            ], 400);
+        }
+
+        $products = Product::where('name', 'LIKE', "%{$search}%")
+            ->orWhere('category', 'LIKE', "%{$search}%")
+            ->get(['id', 'name','category', 'price', 'quantity']);
+
+        if ($products->isEmpty()){
+            return response()->json([
+                'status' => 'success',
+                'message' => 'Product not found.',
+                'data' => []
+            ], 200);
+        }
+
+        return response()->json([
+            'status' => 'success',
+            'message' => 'Product found.',
+            'data' => $products
+        ], 200);
+    }
 
 }
