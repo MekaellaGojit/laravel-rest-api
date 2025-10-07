@@ -75,7 +75,7 @@ class ProductController extends Controller
 
             return response()->json([
                 'status' => 'success',
-                'message' => 'Product retrieved successfully.',
+                'message' => 'Product created successfully.',
                 'data' => $product
             ]);
         }
@@ -83,15 +83,60 @@ class ProductController extends Controller
     }
 
     public function update(Request $request, $id){
+        $validatedData = $request->validate([
+            'name' => 'required|string',
+            'category' => 'required|string',
+            'cost' => "required|decimal:2",
+            'price' => "required|decimal:2",
+            'quantity'=> 'required|integer',
+            'expiration'=> 'required|date',
+            'image_url' => "nullable",
+        ]);
 
+        $product = Product::where('id',$id)->first();
+        if(!$product){
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Product not found'
+            ]);
+        }
+
+        $updatedProduct = $product->update([
+            'name' => $validatedData['name'],
+            'category' => $validatedData['category'],
+            'cost' => $validatedData['cost'],
+            'price' => $validatedData['price'],
+            'quantity' => $validatedData['quantity'],
+            'expiration' => $validatedData['expiration'],
+            'image_url' => $validatedData['image_url']
+        ]);
+
+        return response()->json([
+            'status' => 'success',
+            'message' => 'Product updated successfully.',
+            'data' => $product
+        ]);
     }
 
     public function destroy($id){
+        $product = Product::where('id',$id)->first();
+        if(!$product){
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Product not found'
+            ]);
+        }
+
+            $product->delete();
+            return response()->json([
+                'status' => 'success',
+                'message' => 'Product deleted successfully.'
+            ]);
 
     }
 
-    public function toggleProduct(){
+    // public function toggleProduct(){
 
-    }
+    // }
 
 }
