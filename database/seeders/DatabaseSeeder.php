@@ -9,21 +9,22 @@ use Illuminate\Database\Seeder;
 
 class DatabaseSeeder extends Seeder
 {
-    /**
-     * Seed the application's database.
-     */
+
     public function run(): void
     {
-        // User::factory(10)->create();
-
-        User::updateOrCreate([
+        User::updateOrCreate(
+            [ 'email' => 'admin@example.com'],
+            [
             'first_name' => 'admin',
             'middle_name' => 'user',
             'last_name' => 'admin',
-            'email' => 'admin@example.com',
             'address' => 'Sta. Magdalena, Sorsogon',
             'password' => Hash::make ('password'),
         ]);
-        $this->call(ProductSeeder::class);
+
+        $this->call([
+            ProductSeeder::class,
+            SaleSeeder::class,
+        ]);
     }
 }

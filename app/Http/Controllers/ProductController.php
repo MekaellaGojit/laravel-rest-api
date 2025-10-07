@@ -14,13 +14,13 @@ class ProductController extends Controller
         if($products->isEmpty()){
             return response()->json([
                 'status' => 'error',
-                'message' => 'No products found.'
+                'message' => 'No products found!'
             ], 404);
         }
 
         return response()->json([
             'status' => 'success',
-            'message' => 'Products retrieved successfully.',
+            'message' => 'Products retrieved successfully!',
             'data' => $products
         ], 200);
 
@@ -32,13 +32,13 @@ class ProductController extends Controller
         if(!$product){
             return response()->json([
                 'status' => 'error',
-                'message' => 'Product not found.'
+                'message' => 'Product not found!'
             ]);
         }
 
         return response()->json([
             'status' => 'success',
-            'message' => 'Product retrieved successfully.',
+            'message' => 'Product retrieved successfully!',
             'data' => $product
         ]);
 
@@ -135,8 +135,34 @@ class ProductController extends Controller
 
     }
 
-    // public function toggleProduct(){
+    public function searchByName(Request $request)
+    {
+        $search = trim($request->query('q'));
 
-    // }
+        if (!$search) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Provide a keyword.'
+            ], 400);
+        }
+
+        $products = Product::where('name', 'LIKE', "%{$search}%")
+            ->orWhere('category', 'LIKE', "%{$search}%")
+            ->get(['id', 'name','category', 'price', 'quantity']);
+
+        if ($products->isEmpty()){
+            return response()->json([
+                'status' => 'success',
+                'message' => 'Product not found.',
+                'data' => []
+            ], 200);
+        }
+
+        return response()->json([
+            'status' => 'success',
+            'message' => 'Product found.',
+            'data' => $products
+        ], 200);
+    }
 
 }
