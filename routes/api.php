@@ -25,7 +25,7 @@ Route::get('/sales', [App\Http\Controllers\SaleController::class, 'index']);
 Route::get('/sales/{id}', [App\Http\Controllers\SaleController::class, 'show']);
 
 Route::middleware('auth:sanctum')->group(function(){
-    Route::post('/upload', [FileUploadController::class, 'upload']);
+    Route::post('/upload', [App\Http\Controllers\FileUploadController::class, 'upload']);
 
     // Logout
     Route::post('/logout', [App\Http\Controllers\AuthController::class, 'logout']);
