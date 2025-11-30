@@ -18,6 +18,14 @@ class ProductController extends Controller
             ], 404);
         }
 
+        $products->transform(function ($product) {
+            $product->image_url = $product->image_url
+                ? asset('storage/uploads/' . $product->image_url)
+                : null;
+
+            return $product;
+        });
+
         return response()->json([
             'status' => 'success',
             'message' => 'Products retrieved successfully!',
@@ -52,7 +60,7 @@ class ProductController extends Controller
             'price' => "required|decimal:2",
             'quantity'=> 'required|integer',
             'expiration'=> 'required|date',
-            'image_url' => "nullable",
+            'image_url' => 'nullable|file|mimes:jpg,jpeg,png|max:2048',
         ]);
 
         if($validatedData){
@@ -63,8 +71,24 @@ class ProductController extends Controller
                 'price' => $validatedData['price'],
                 'quantity' => $validatedData['quantity'],
                 'expiration' => $validatedData['expiration'],
-                'image_url' => $validatedData['image_url']
+                'image_url' => $validatedData['image_url'],
             ]);
+
+            if ($request->hasFile('image_url')) {
+                $filename = time() . '.' . $request->image_url->extension();
+                $request->image_url->storeAs('uploads', $filename, 'public');
+
+                $product->image_url = $filename;
+                $product->save();
+            }
+
+            return response()->json([
+                'product' => $product,
+                'image_url' => $product->image_url
+                    ? asset('storage/uploads/' . $product->image_url)
+                    : null
+            ]);
+
 
             if(!$product){
                 return response()->json([
@@ -74,13 +98,14 @@ class ProductController extends Controller
             }
 
             return response()->json([
-                'status' => 'success',
-                'message' => 'Product created successfully.',
-                'data' => $product
-            ]);
-        }
+                    'status' => 'success',
+                    'message' => 'Product created successfully.',
+                    'data' => $product,
+                    'image_url' => $product->image ? asset('storage/uploads/' . $product->image) : null
+                ]);
+            }
 
-    }
+        }
 
     public function update(Request $request, $id){
         $validatedData = $request->validate([
@@ -90,7 +115,7 @@ class ProductController extends Controller
             'price' => "required|decimal:2",
             'quantity'=> 'required|integer',
             'expiration'=> 'required|date',
-            'image_url' => "nullable",
+            'image_url' =>'nullable|file|mimes:jpg,jpeg,png|max:2048',
         ]);
 
         $product = Product::where('id',$id)->first();
