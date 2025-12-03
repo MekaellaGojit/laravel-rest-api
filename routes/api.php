@@ -9,11 +9,8 @@ use App\Http\Controllers\SaleController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\FileUploadController;
 
-// // Test Route
-// Route::get('/test', function () {
-//     return response()->json(['message' => 'API is working']);
-// });
 
+// Test database
 Route::get('/test-db', function () {
     try {
         DB::connection()->getPdo();
@@ -39,6 +36,32 @@ Route::get('/migrate', function () {
             'status' => 'success',
             'message' => 'Migrations completed',
             'output' => Artisan::output()
+        ]);
+    } catch (\Exception $e) {
+        return response()->json([
+            'status' => 'error',
+            'message' => $e->getMessage()
+        ], 500);
+    }
+});
+
+// Temporary test route - creates a product without auth
+Route::get('/products/test-create', function () {
+    try {
+        $product = \App\Models\Product::create([
+            'name' => 'San Miguel Beer',
+            'category' => 'Beverages',
+            'cost' => 20.00,
+            'price' => 35.00,
+            'quantity' => 100,
+            'expiration' => '2026-12-31',
+            'image_url' => null
+        ]);
+
+        return response()->json([
+            'status' => 'success',
+            'message' => 'Test product created successfully',
+            'data' => $product
         ]);
     } catch (\Exception $e) {
         return response()->json([
