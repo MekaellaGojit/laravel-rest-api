@@ -46,6 +46,32 @@ Route::get('/migrate', function () {
     }
 });
 
+// Temporary test route - creates a product without auth
+Route::get('/products/test-create', function () {
+    try {
+        $product = \App\Models\Product::create([
+            'name' => 'San Miguel Beer',
+            'category' => 'Beverages',
+            'cost' => 20.00,
+            'price' => 35.00,
+            'quantity' => 100,
+            'expiration' => '2026-12-31',
+            'image_url' => null
+        ]);
+
+        return response()->json([
+            'status' => 'success',
+            'message' => 'Test product created successfully',
+            'data' => $product
+        ]);
+    } catch (\Exception $e) {
+        return response()->json([
+            'status' => 'error',
+            'message' => $e->getMessage()
+        ], 500);
+    }
+});
+
 Route::post('/register', [App\Http\Controllers\AuthController::class, 'register']);
 Route::post('/login', [App\Http\Controllers\AuthController::class, 'login']);
 
