@@ -7,9 +7,27 @@ use App\Http\Controllers\SaleController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\FileUploadController;
 
-// Test Route
-Route::get('/test', function () {
-    return response()->json(['message' => 'API is working']);
+// // Test Route
+// Route::get('/test', function () {
+//     return response()->json(['message' => 'API is working']);
+// });
+
+Route::get('/test-db', function () {
+    try {
+        DB::connection()->getPdo();
+        $dbName = DB::connection()->getDatabaseName();
+        return response()->json([
+            'status' => 'success',
+            'message' => 'Database connected successfully!',
+            'database' => $dbName
+        ]);
+    } catch (\Exception $e) {
+        return response()->json([
+            'status' => 'error',
+            'message' => 'Could not connect to database',
+            'error' => $e->getMessage()
+        ], 500);
+    }
 });
 
 Route::post('/register', [App\Http\Controllers\AuthController::class, 'register']);
