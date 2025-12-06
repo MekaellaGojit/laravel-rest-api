@@ -67,8 +67,8 @@ class ProductController extends Controller
             $product = Product::create([
                 'name' => $validatedData['name'],
                 'category' => $validatedData['category'],
-                'cost' => $validatedData['cost'],
-                'price' => $validatedData['price'],
+                'cost' => number_format($validatedData['cost'], 2, '.', ''),
+                'price' => number_format($validatedData['price'], 2, '.', ''),
                 'quantity' => $validatedData['quantity'],
                 'expiration' => $validatedData['expiration'],
             ]);
