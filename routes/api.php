@@ -45,46 +45,21 @@ Route::get('/migrate', function () {
     }
 });
 
-// Temporary test route - creates a product without auth
-Route::get('/products/test-create', function () {
-    try {
-        $product = \App\Models\Product::create([
-            'name' => 'San Miguel Beer',
-            'category' => 'Beverages',
-            'cost' => 20.00,
-            'price' => 35.00,
-            'quantity' => 100,
-            'expiration' => '2026-12-31',
-            'image_url' => null
-        ]);
 
-        return response()->json([
-            'status' => 'success',
-            'message' => 'Test product created successfully',
-            'data' => $product
-        ]);
-    } catch (\Exception $e) {
-        return response()->json([
-            'status' => 'error',
-            'message' => $e->getMessage()
-        ], 500);
-    }
-});
+    Route::post('/register', [App\Http\Controllers\AuthController::class, 'register']);
+    Route::post('/login', [App\Http\Controllers\AuthController::class, 'login']);
 
-Route::post('/register', [App\Http\Controllers\AuthController::class, 'register']);
-Route::post('/login', [App\Http\Controllers\AuthController::class, 'login']);
+    // Products (public)
+    Route::get('/products', [App\Http\Controllers\ProductController::class, 'index']);
+    Route::get('/products/search', [App\Http\Controllers\ProductController::class, 'searchByName']);
+    Route::get('/products/{id}', [App\Http\Controllers\ProductController::class, 'show']);
 
-// Products (public)
-Route::get('/products', [App\Http\Controllers\ProductController::class, 'index']);
-Route::get('/products/search', [App\Http\Controllers\ProductController::class, 'searchByName']);
-Route::get('/products/{id}', [App\Http\Controllers\ProductController::class, 'show']);
+    // Sales (public)
+    Route::get('/sales', [App\Http\Controllers\SaleController::class, 'index']);
+    Route::get('/sales/{id}', [App\Http\Controllers\SaleController::class, 'show']);
 
-// Sales (public)
-Route::get('/sales', [App\Http\Controllers\SaleController::class, 'index']);
-Route::get('/sales/{id}', [App\Http\Controllers\SaleController::class, 'show']);
-
-Route::middleware('auth:sanctum')->group(function(){
-    Route::post('/upload', [App\Http\Controllers\FileUploadController::class, 'upload']);
+    Route::middleware('auth:sanctum')->group(function(){
+        Route::post('/upload', [App\Http\Controllers\FileUploadController::class, 'upload']);
 
     // Logout
     Route::post('/logout', [App\Http\Controllers\AuthController::class, 'logout']);

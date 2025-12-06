@@ -53,17 +53,17 @@ class ProductController extends Controller
     }
 
     public function store(Request $request){
-        $validatedData = $request->validate([
-            'name' => 'required|string',
-            'category' => 'required|string',
-            'cost' => "required|decimal:2",
-            'price' => "required|decimal:2",
-            'quantity'=> 'required|integer',
-            'expiration'=> 'required|date',
-            'image_url' => 'nullable|file|mimes:jpg,jpeg,png|max:2048',
-        ]);
+        try {
+            $validatedData = $request->validate([
+                'name' => 'required|string|max:255',
+                'category' => 'required|string|max:255',
+                'cost' => 'required|numeric|min:0',
+                'price' => 'required|numeric|min:0',
+                'quantity' => 'required|integer|min:0',
+                'expiration' => 'required|date',
+                'image_url' => 'nullable|file|mimes:jpg,jpeg,png|max:2048',
+            ]);
 
-        if($validatedData){
             $product = Product::create([
                 'name' => $validatedData['name'],
                 'category' => $validatedData['category'],
@@ -71,9 +71,9 @@ class ProductController extends Controller
                 'price' => $validatedData['price'],
                 'quantity' => $validatedData['quantity'],
                 'expiration' => $validatedData['expiration'],
-                'image_url' => $validatedData['image_url'],
             ]);
 
+            // Handle image upload if present
             if ($request->hasFile('image_url')) {
                 $filename = time() . '.' . $request->image_url->extension();
                 $request->image_url->storeAs('uploads', $filename, 'public');
@@ -83,29 +83,27 @@ class ProductController extends Controller
             }
 
             return response()->json([
-                'product' => $product,
+                'status' => 'success',
+                'message' => 'Product created successfully.',
+                'data' => $product,
                 'image_url' => $product->image_url
                     ? asset('storage/uploads/' . $product->image_url)
                     : null
-            ]);
+            ], 201);
 
-
-            if(!$product){
-                return response()->json([
-                    'status' => 'error',
-                    'message' => 'An error occurred when creating product'
-                ]);
-            }
-
+        } catch (\Illuminate\Validation\ValidationException $e) {
             return response()->json([
-                    'status' => 'success',
-                    'message' => 'Product created successfully.',
-                    'data' => $product,
-                    'image_url' => $product->image ? asset('storage/uploads/' . $product->image) : null
-                ]);
-            }
-
+                'status' => 'error',
+                'message' => 'Validation failed',
+                'errors' => $e->errors()
+            ], 422);
+        } catch (\Exception $e) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Server Error: ' . $e->getMessage()
+            ], 500);
         }
+    }
 
     public function update(Request $request, $id){
         $validatedData = $request->validate([
