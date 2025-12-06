@@ -54,6 +54,9 @@ class ProductController extends Controller
 
     public function store(Request $request){
         try {
+            // Log what we received
+            \Log::info('Request data:', $request->all());
+
             $validatedData = $request->validate([
                 'name' => 'required|string|max:255',
                 'category' => 'required|string|max:255',
@@ -61,34 +64,21 @@ class ProductController extends Controller
                 'price' => 'required|numeric|min:0',
                 'quantity' => 'required|integer|min:0',
                 'expiration' => 'required|date',
-                'image_url' => 'nullable|file|mimes:jpg,jpeg,png|max:2048',
             ]);
 
             $product = Product::create([
                 'name' => $validatedData['name'],
                 'category' => $validatedData['category'],
-                'cost' => number_format($validatedData['cost'], 2, '.', ''),
-                'price' => number_format($validatedData['price'], 2, '.', ''),
+                'cost' => $validatedData['cost'],
+                'price' => $validatedData['price'],
                 'quantity' => $validatedData['quantity'],
                 'expiration' => $validatedData['expiration'],
             ]);
 
-            // Handle image upload if present
-            if ($request->hasFile('image_url')) {
-                $filename = time() . '.' . $request->image_url->extension();
-                $request->image_url->storeAs('uploads', $filename, 'public');
-
-                $product->image_url = $filename;
-                $product->save();
-            }
-
             return response()->json([
                 'status' => 'success',
                 'message' => 'Product created successfully.',
-                'data' => $product,
-                'image_url' => $product->image_url
-                    ? asset('storage/uploads/' . $product->image_url)
-                    : null
+                'data' => $product
             ], 201);
 
         } catch (\Illuminate\Validation\ValidationException $e) {
@@ -97,10 +87,16 @@ class ProductController extends Controller
                 'message' => 'Validation failed',
                 'errors' => $e->errors()
             ], 422);
+
         } catch (\Exception $e) {
+            \Log::error('Product creation error: ' . $e->getMessage());
+            \Log::error($e->getTraceAsString());
+
             return response()->json([
                 'status' => 'error',
-                'message' => 'Server Error: ' . $e->getMessage()
+                'message' => $e->getMessage(),
+                'line' => $e->getLine(),
+                'file' => $e->getFile()
             ], 500);
         }
     }
