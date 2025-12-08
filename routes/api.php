@@ -2,6 +2,8 @@
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Artisan;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\SaleController;
 use App\Http\Controllers\AuthController;
@@ -46,20 +48,21 @@ Route::get('/migrate', function () {
     }
 });
 
-Route::post('/register', [App\Http\Controllers\AuthController::class, 'register']);
-Route::post('/login', [App\Http\Controllers\AuthController::class, 'login']);
 
-// Products (public)
-Route::get('/products', [App\Http\Controllers\ProductController::class, 'index']);
-Route::get('/products/search', [App\Http\Controllers\ProductController::class, 'searchByName']);
-Route::get('/products/{id}', [App\Http\Controllers\ProductController::class, 'show']);
+    Route::post('/register', [App\Http\Controllers\AuthController::class, 'register']);
+    Route::post('/login', [App\Http\Controllers\AuthController::class, 'login']);
 
-// Sales (public)
-Route::get('/sales', [App\Http\Controllers\SaleController::class, 'index']);
-Route::get('/sales/{id}', [App\Http\Controllers\SaleController::class, 'show']);
+    // Products (public)
+    Route::get('/products', [App\Http\Controllers\ProductController::class, 'index']);
+    Route::get('/products/search', [App\Http\Controllers\ProductController::class, 'searchByName']);
+    Route::get('/products/{id}', [App\Http\Controllers\ProductController::class, 'show']);
 
-Route::middleware('auth:sanctum')->group(function(){
-    Route::post('/upload', [App\Http\Controllers\FileUploadController::class, 'upload']);
+    // Sales (public)
+    Route::get('/sales', [App\Http\Controllers\SaleController::class, 'index']);
+    Route::get('/sales/{id}', [App\Http\Controllers\SaleController::class, 'show']);
+
+    Route::middleware('auth:sanctum')->group(function(){
+        Route::post('/upload', [App\Http\Controllers\FileUploadController::class, 'upload']);
 
     // Logout
     Route::post('/logout', [App\Http\Controllers\AuthController::class, 'logout']);
