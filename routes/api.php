@@ -9,8 +9,11 @@ use App\Http\Controllers\SaleController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\FileUploadController;
 
+// // Test Route
+// Route::get('/test', function () {
+//     return response()->json(['message' => 'API is working']);
+// });
 
-// Test database
 Route::get('/test-db', function () {
     try {
         DB::connection()->getPdo();
